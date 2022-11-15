@@ -15,14 +15,15 @@ and Address = '6939 Elka Place';
 
 INSERT into orders values (1001,70,'2022-09-20 14:00:00');
 
--- select count(*) from orders;
-
 select * from dishes where Name in ('House Salad','Mini Cheeseburgers',
 'Tropical Blue Smoothie');
 -- dishid 4,7,20
 
-INSERT into CustomersDishes
-values (9,70,4),(10,70,7),(11,70,20);
+INSERT INTO OrdersDishes (OrderID,DishID) VALUES
+(1001,(SELECT DishID FROM Dishes WHERE Name = 'House Salad')),
+(1001,(SELECT DishID FROM Dishes WHERE Name = 'Mini Cheeseburgers')),
+(1001,(SELECT DishID FROM Dishes WHERE Name = 'Tropical Blue Smoothie'));
+select count(*) from OrdersDishes;
 
 select 
 sum(
@@ -32,3 +33,13 @@ when Name = 'Mini Cheeseburgers' then price *1
 when Name = 'Tropical Blue Smoothie' then price * 1
 end ) as tot_cost
 from dishes;
+
+select c.CustomerID,o.OrderID,o.OrderDate,
+c.FirstName,c.LastName,c.Email,
+d.DishID,d.Name,sum(d.Price)
+from Orders o
+JOIN Customers c on o.CustomerID = c.CustomerID
+join OrdersDishes od on o.OrderID = od.OrderID
+join dishes d on d.DishID = od.DishID
+WHERE o.OrderID = 1001
+;
